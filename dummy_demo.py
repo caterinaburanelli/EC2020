@@ -15,5 +15,9 @@ if not os.path.exists(experiment_name):
 
 # initializes environment with ai player using random controller, playing against static enemy
 env = Environment(experiment_name=experiment_name)
+
+def function():
+    pass
+
 env.play()
 
