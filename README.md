@@ -21,3 +21,5 @@ Possible changes or improvements:
 - blend or arithmetic recombination
 - nonuniform mutation
 - different mating pool: generational model
+- allowing duplicates between the parents
+- deciding the dimension of lambda (offspring) and mu (parents)
