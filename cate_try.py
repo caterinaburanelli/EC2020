@@ -96,16 +96,17 @@ def select_mating_pool(pop, fitness):
         # so I set it as a bad number so teh parent will not be chosen again
         # ====> must decide what value
         fitness[max_fitness_idx] = -99999999999
+    print(parents.shape)
 
     return parents
 
 def crossover(parents):
-    offspring_size = (parents.shape[0]/2, parents.shape[1])
+    offspring_size = (pop.shape[0]/2, parents.shape[1])
     offspring = numpy.empty(offspring_size)
     # The point at which crossover takes place between two parents
     # a random number between 1 and l-1, with l=n_vars
     crossover_point = numpy.random.randint(1, n_vars, size=1)
- 
+    #print(parents.shape, offspring_size)
     for k in range(offspring_size[0]):
          # Index of the parents: the mating happens with p[0]-p[1], p[1]-p[2],
          # p[2]-p[3]... untill there is no more offspring needed         
@@ -150,7 +151,7 @@ for generation in range(num_generations):
      offspring_mutation = mutation(offspring_crossover)
      # Creating the new population based on the parents and offspring.
      pop[0:parents.shape[0], :] = parents
-     pop[1:parents.shape[0]:, :] = offspring_mutation
+     pop[parents.shape[0]:, :] = offspring_mutation
      print(pop.shape)
 
      # Calculates mean, std and best
