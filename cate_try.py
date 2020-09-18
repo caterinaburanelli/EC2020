@@ -8,40 +8,78 @@
 #       half and the offspring of the best half (problem of incest)
 # - we do mutation only on the offspring or in all the population?
 
-import ga
+################################
+# EvoMan FrameWork - V1.0 2016 #
+# Author: Karine Miras         #
+# karine.smiras@gmail.com      #
+################################
+
+
+# imports framework
+import sys
+sys.path.insert(0, 'evoman')
+from environment import Environment
+from demo_controller import player_controller
+
+# imports other libs
+import time
+from math import fabs,sqrt
+import glob, os
 import numpy
 
-num_vars = # number of genes
-# the first weigths are randomly generated
-weigths = numpy.random.uniform(low=-1.0, high=1.0, size=num_vars)
-sol_per_pop =  100 # how many individuals
-pop_size = (sol_per_pop,num_vars) # the pop has sol_per_pop individuals
-                                  # with num_vars genes, it's a matrix
+experiment_name = 'dummy_demo'
+if not os.path.exists(experiment_name):
+    os.makedirs(experiment_name)
 
-# random population
-new_population = numpy.random.uniform(low=-1.0, high=1.0, size=pop_size)
+n_hidden_neurons = 10
 
-num_generations = 10 # number of generation we implement the sequence
+# initializes simulation in individual evolution mode, for single static enemy.
+env = Environment(experiment_name=experiment_name,
+                  enemies=[2],
+                  playermode="ai",
+                  player_controller=player_controller(n_hidden_neurons),
+                  enemymode="static",
+                  level=2,
+                  speed="fastest")
 
-for generation in range(num_generations):
-     # Measuring the fitness of each chromosome in the population.
-     fitness = ga.cal_pop_fitness(equation_inputs, new_population)
-     # Selecting the best parents in the population for mating.
-     parents = ga.select_mating_pool(new_population, fitness)
-     # Generating next generation using crossover.
-     offspring_crossover = ga.crossover(parents) 
-     # Adding some variations to the offsrping using mutation.
-     offspring_mutation = ga.mutation(offspring_crossover)
-     # Creating the new population based on the parents and offspring.
-     new_population[0:parents.shape[0], :] = parents
-     new_population[parents.shape[0]:, :] = offspring_mutation
+# default environment fitness is assumed for experiment
 
-# fitness function
-def cal_pop_fitness(weigths, pop):
-     # Calculating the fitness value of each solution in the current population.
-     # The fitness function calculates the sum of products between each input and its corresponding weight.
-     fitness = numpy.sum(pop*equation_inputs, axis=1)
-     return fitness
+env.state_to_log() # checks environment state
+
+
+####   Optimization for controller solution (best genotype-weights for phenotype-network): Ganetic Algorihm    ###
+
+ini = time.time()  # sets time marker
+
+
+# genetic algorithm params
+
+run_mode = 'train' # train or test
+
+# number of weights for multilayer with 10 hidden neurons
+n_vars = (env.get_num_sensors()+1)*n_hidden_neurons + (n_hidden_neurons+1)*5
+
+def simulation(env,x):
+    f,p,e,t = env.play(pcont=x)
+    return f
+
+# normalizes
+def norm(x, pfit_pop):
+
+    if ( max(pfit_pop) - min(pfit_pop) ) > 0:
+        x_norm = ( x - min(pfit_pop) )/( max(pfit_pop) - min(pfit_pop) )
+    else:
+        x_norm = 0
+
+    if x_norm <= 0:
+        x_norm = 0.0000000001
+    return x_norm
+
+
+# evaluation
+def evaluate(x):
+    return numpy.array(list(map(lambda y: simulation(env,y), x)))
+
 
 def select_mating_pool(pop, fitness):
 
@@ -49,7 +87,7 @@ def select_mating_pool(pop, fitness):
     parent_num = pop.shape[0]/2
     parents = numpy.empty((parent_num, pop.shape[1]))
 
-    for parent_num in range(num_parents):
+    for parent_num in range(parent_num):
         # find the index for the best half
         max_fitness_idx = numpy.where(fitness == numpy.max(fitness))
         max_fitness_idx = max_fitness_idx[0][0]
@@ -78,7 +116,7 @@ def crossover(parents):
          offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
          # The new offspring will have its second half of its genes taken from the second parent.
          offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
-     return offspring
+    return offspring
 
 def mutation(offspring_crossover):
 
@@ -93,5 +131,39 @@ def mutation(offspring_crossover):
     
     return offspring_crossover
 
-new_population[0:parents.shape[0], :] = parents
-new_population[parents.shape[0]:, :] = offspring_mutation
+# the first weigths are randomly generated
+sol_per_pop =  10 # how many individuals
+pop = numpy.random.uniform(-1, 1, (sol_per_pop, n_vars))
+pop_size = (sol_per_pop,n_vars) # the pop has sol_per_pop individuals
+                                  # with num_vars genes, it's a matrix
+
+num_generations = 2 # number of generation we implement the sequence
+
+for generation in range(num_generations):
+     # Measuring the fitness of each chromosome in the population.
+     fitness = evaluate(pop)
+     # Selecting the best parents in the population for mating.
+     parents = select_mating_pool(pop, fitness)
+     # Generating next generation using crossover.
+     offspring_crossover = crossover(parents) 
+     # Adding some variations to the offsrping using mutation.
+     offspring_mutation = mutation(offspring_crossover)
+     # Creating the new population based on the parents and offspring.
+     pop[0:parents.shape[0], :] = parents
+     pop[1:parents.shape[0]:, :] = offspring_mutation
+     print(pop.shape)
+
+     # Calculates mean, std and best
+
+     best = numpy.argmax(fitness)
+     mean = numpy.mean(fitness)
+     std = numpy.std(fitness)
+
+     # saves results for first pop
+     file_aux  = open(experiment_name+'/results.txt','a')
+     file_aux.write('\n\ngen best mean std')
+     
+     file_aux.write('\n'+str(generation)+' '+str(round(fitness[best],6))+' '+str(round(mean,6))+' '+str(round(std,6))   )
+     file_aux.close()
+pop[0:parents.shape[0], :] = parents
+pop[parents.shape[0]:, :] = offspring_mutation
