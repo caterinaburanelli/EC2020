@@ -116,7 +116,7 @@ def main1(seed, game, enemy):
     # generation: each individual of the current generation
     # is replaced by the 'fittest' (best) of three individuals
     # drawn randomly from the current generation.
-    toolbox.register("select", tools.selTournament)
+    toolbox.register("select", tools.selBest)
 
     creator.create("FitnessMin", base.Fitness, weights=(-100,))
 
@@ -136,7 +136,7 @@ def main1(seed, game, enemy):
 
     # runs simulation
     def main(seed, game, enemy):
-        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'Tournement.txt','a')
+        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'All.txt','a')
         file_aux.write(f'\ngame {game} \n')
         file_aux.write('gen, best, mean, std, median, q1, q3, life')
         file_aux.close()
@@ -187,12 +187,12 @@ def main1(seed, game, enemy):
         length = len(pop)
         mean = sum(fits) / length * -1
         sum2 = sum(x*x for x in fits)
-        std = abs(sum2 / length - abs(mean)**2)**0.5
+        std = abs(sum2 / length - mean**2)**0.5
         q1 = np.percentile(fits, 25) * -1
         median = np.percentile(fits, 50) * -1 
         q3 = np.percentile(fits, 75) * -1
         max_life = max(lifes) 
-        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'Tournement.txt','a')
+        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'All.txt','a')
         file_aux.write(f'\n{str(g)}, {str(round(min(fits)*-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
         file_aux.close()
 
@@ -203,7 +203,7 @@ def main1(seed, game, enemy):
             print("-- Generation %i --" % g)
 
             # Select the next generation individuals
-            offspring = toolbox.select(pop, len(pop), 5)
+            offspring = toolbox.select(pop, len(pop))
             
             for i in offspring:
                 print(i.fitness.values[0])
@@ -277,13 +277,13 @@ def main1(seed, game, enemy):
             q3 = np.percentile(fits, 75) * -1
             max_life = max(lifes) 
             
-            print("  Min %s" % max(fits))
-            print("  Max %s" % min(fits))
+            print("  Min %s" % min(fits))
+            print("  Max %s" % max(fits))
             print("  Avg %s" % mean)
             print("  Std %s" % std)
 
             # saves results for first pop
-            file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'Tournement.txt','a')
+            file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'All.txt','a')
             file_aux.write(f'\n{str(g)}, {str(round(min(fits) *-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
             file_aux.close()
         
@@ -291,10 +291,10 @@ def main1(seed, game, enemy):
         
         best_ind = tools.selBest(pop, 1)[0]
         print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
-        np.savetxt(experiment_name+'/best_game_'+str(game)+',enemy_'+str(enemy)+'Tournement.txt',best_ind)
+        np.savetxt(experiment_name+'/best_game_'+str(game)+',enemy_'+str(enemy)+'All.txt',best_ind)
     main(seed, game, enemy)
 
-enemy = 1
+enemy = 2
 for game in range(10):
     seed = random.randint(1, 126)
     main1(seed, game, enemy)

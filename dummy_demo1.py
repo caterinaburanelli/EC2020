@@ -187,7 +187,7 @@ def main1(seed, game, enemy):
         length = len(pop)
         mean = sum(fits) / length * -1
         sum2 = sum(x*x for x in fits)
-        std = abs(sum2 / length - abs(mean)**2)**0.5
+        std = abs(sum2 / length - mean**2)**0.5 
         q1 = np.percentile(fits, 25) * -1
         median = np.percentile(fits, 50) * -1 
         q3 = np.percentile(fits, 75) * -1
@@ -277,8 +277,8 @@ def main1(seed, game, enemy):
             q3 = np.percentile(fits, 75) * -1
             max_life = max(lifes) 
             
-            print("  Min %s" % max(fits))
-            print("  Max %s" % min(fits))
+            print("  Min %s" % min(fits))
+            print("  Max %s" % max(fits))
             print("  Avg %s" % mean)
             print("  Std %s" % std)
 
@@ -294,7 +294,7 @@ def main1(seed, game, enemy):
         np.savetxt(experiment_name+'/best_game_'+str(game)+',enemy_'+str(enemy)+'Tournement.txt',best_ind)
     main(seed, game, enemy)
 
-enemy = 1
+enemy = 2
 for game in range(10):
     seed = random.randint(1, 126)
     main1(seed, game, enemy)
