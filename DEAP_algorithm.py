@@ -36,7 +36,7 @@ from deap import creator
 from deap import tools
 from math import fabs,sqrt
 
-def main1(seed, game, enemy):
+def main1(seed, game, enemy, algorithm):
     experiment_name = 'dummy_demo'
     if not os.path.exists(experiment_name):
         os.makedirs(experiment_name)
@@ -136,7 +136,7 @@ def main1(seed, game, enemy):
 
     # runs simulation
     def main(seed, game, enemy):
-        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'Tournement.txt','a')
+        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+ str(algorithm) + '.txt','a')
         file_aux.write(f'\ngame {game} \n')
         file_aux.write('gen, best, mean, std, median, q1, q3, life')
         file_aux.close()
@@ -187,7 +187,7 @@ def main1(seed, game, enemy):
         length = len(pop)
         mean = sum(fits) / length * -1
         sum2 = sum(x*x for x in fits)
-        std = abs(sum2 / length - mean**2)**0.5
+        std = abs(sum2 / length - abs(mean)**2)**0.5
         q1 = np.percentile(fits, 25) * -1
         median = np.percentile(fits, 50) * -1 
         q3 = np.percentile(fits, 75) * -1
@@ -277,8 +277,8 @@ def main1(seed, game, enemy):
             q3 = np.percentile(fits, 75) * -1
             max_life = max(lifes) 
             
-            print("  Min %s" % min(fits))
-            print("  Max %s" % max(fits))
+            print("  Min %s" % max(fits))
+            print("  Max %s" % min(fits))
             print("  Avg %s" % mean)
             print("  Std %s" % std)
 
@@ -294,8 +294,11 @@ def main1(seed, game, enemy):
         np.savetxt(experiment_name+'/best_game_'+str(game)+',enemy_'+str(enemy)+'Tournement.txt',best_ind)
     main(seed, game, enemy)
 
-enemy = 3
-for game in range(10):
-    seed = random.randint(1, 126)
-    main1(seed, game, enemy)
+algorithms = ['Tournement', 'All']
+enemies = [1, 2, 3]
+for algorithm in algorithms:
+    for enemy in enemies:
+        for game in range(10):
+            seed = random.randint(1, 126)
+            main1(seed, game, enemy ,algorithm)
 
