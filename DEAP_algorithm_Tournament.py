@@ -46,11 +46,12 @@ def main1(seed, game, algorithm):
 
     # initializes simulation in individual evolution mode, for single static enemy.
     env = Environment(experiment_name=experiment_name,
-                    enemies=[7,8 ],
+                    enemies=[3,7,8],
                     playermode="ai",
                     player_controller=player_controller(n_hidden_neurons),
                     enemymode="static",
                     level=2,
+                    multiplemode="yes",
                     speed="fastest")
 
     # default environment fitness is assumed for experiment
@@ -127,16 +128,16 @@ def main1(seed, game, algorithm):
         f,p,e,t = env.play(pcont=x)
         return f, p
 
-    # a = f'/best_game_{game},enemy_{enemy},mutation_{MUTPB}.txt'
-    # # Load specialist controller
-    # sol = np.loadtxt('dummy_demo' + a)
-    # print('\n LOADING SAVED SPECIALIST SOLUTION FOR ENEMY \n')
-    # evaluate([sol])
+    a = f'/best_game_{game}Tournement.txt'
+    # Load specialist controller
+    sol = np.loadtxt('dummy_demo' + a)
+    print('\n LOADING SAVED SPECIALIST SOLUTION FOR ENEMY \n')
+    evaluate([sol])
 
-
+    print("hallo")
     # runs simulation
     def main(seed, game):
-        file_aux  = open(experiment_name+'/results_enemy'+ str(algorithm) + '.txt','a')
+        file_aux  = open(str(algorithm)+'.txt','a')
         file_aux.write(f'\ngame {game} \n')
         file_aux.write('gen, best, mean, std, median, q1, q3, life')
         file_aux.close()
@@ -146,7 +147,7 @@ def main1(seed, game, algorithm):
 
         # create an initial population of 300 individuals (where
         # each individual is a list of integers)
-        pop = toolbox.population(n=50)
+        pop = toolbox.population(n=30)
         pop_array = np.array(pop)
 
         # CXPB  is the probability with which two individuals
@@ -203,7 +204,7 @@ def main1(seed, game, algorithm):
             print("-- Generation %i --" % g)
 
             # Select the next generation individuals
-            offspring = toolbox.select(pop, len(pop), 5)
+            offspring = toolbox.select(pop, len(pop), 6)
             
             for i in offspring:
                 print(i.fitness.values[0])
@@ -286,16 +287,17 @@ def main1(seed, game, algorithm):
             file_aux  = open(experiment_name+'/Tournement.txt','a')
             file_aux.write(f'\n{str(g)}, {str(round(min(fits) *-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
             file_aux.close()
-        
+            best_ind = tools.selBest(pop, 1)[0]
+            print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+            open(experiment_name+'/best_game_'+str(game)+'Tournement.txt', "w").close()
+            np.savetxt(experiment_name+'/best_game_'+str(game)+'Tournement.txt',best_ind)
         print("-- End of (successful) evolution --")
         
-        best_ind = tools.selBest(pop, 1)[0]
-        print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
-        np.savetxt(experiment_name+'/best_game_'+str(game)+'Tournement.txt',best_ind)
-    main(seed, game)
+
+    # main(seed, game)
 
 algorithm = 'Tournement'
-for game in range(10):
+for game in range(1):
     seed = random.randint(1, 126)
     main1(seed, game ,algorithm)
 
