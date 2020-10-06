@@ -36,7 +36,7 @@ from deap import creator
 from deap import tools
 from math import fabs,sqrt
 
-def main1(seed, game, enemy, algorithm):
+def main1(seed, game, algorithm):
     experiment_name = 'dummy_demo'
     if not os.path.exists(experiment_name):
         os.makedirs(experiment_name)
@@ -46,7 +46,7 @@ def main1(seed, game, enemy, algorithm):
 
     # initializes simulation in individual evolution mode, for single static enemy.
     env = Environment(experiment_name=experiment_name,
-                    enemies=[enemy],
+                    enemies=[7,8 ],
                     playermode="ai",
                     player_controller=player_controller(n_hidden_neurons),
                     enemymode="static",
@@ -135,8 +135,8 @@ def main1(seed, game, enemy, algorithm):
 
 
     # runs simulation
-    def main(seed, game, enemy):
-        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+ str(algorithm) + '.txt','a')
+    def main(seed, game):
+        file_aux  = open(experiment_name+'/results_enemy'+ str(algorithm) + '.txt','a')
         file_aux.write(f'\ngame {game} \n')
         file_aux.write('gen, best, mean, std, median, q1, q3, life')
         file_aux.close()
@@ -192,7 +192,7 @@ def main1(seed, game, enemy, algorithm):
         median = np.percentile(fits, 50) * -1 
         q3 = np.percentile(fits, 75) * -1
         max_life = max(lifes) 
-        file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'Tournement.txt','a')
+        file_aux  = open(experiment_name+'/Tournement.txt','a')
         file_aux.write(f'\n{str(g)}, {str(round(min(fits)*-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
         file_aux.close()
 
@@ -283,7 +283,7 @@ def main1(seed, game, enemy, algorithm):
             print("  Std %s" % std)
 
             # saves results for first pop
-            file_aux  = open(experiment_name+'/results_enemy'+str(enemy)+'Tournement.txt','a')
+            file_aux  = open(experiment_name+'/Tournement.txt','a')
             file_aux.write(f'\n{str(g)}, {str(round(min(fits) *-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
             file_aux.close()
         
@@ -291,14 +291,11 @@ def main1(seed, game, enemy, algorithm):
         
         best_ind = tools.selBest(pop, 1)[0]
         print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
-        np.savetxt(experiment_name+'/best_game_'+str(game)+',enemy_'+str(enemy)+'Tournement.txt',best_ind)
-    main(seed, game, enemy)
+        np.savetxt(experiment_name+'/best_game_'+str(game)+'Tournement.txt',best_ind)
+    main(seed, game)
 
-algorithms = ['Tournement', 'All']
-enemies = [1, 2, 3]
-for algorithm in algorithms:
-    for enemy in enemies:
-        for game in range(10):
-            seed = random.randint(1, 126)
-            main1(seed, game, enemy ,algorithm)
+algorithm = 'Tournement'
+for game in range(10):
+    seed = random.randint(1, 126)
+    main1(seed, game ,algorithm)
 
