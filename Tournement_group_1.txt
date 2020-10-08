@@ -1,3 +1,0 @@
-
-game 0 
-gen, best, mean, std, median, q1, q3, life
