@@ -36,7 +36,7 @@ from deap import creator
 from deap import tools
 from math import fabs,sqrt
 
-def main1(seed, game, algorithm, group):
+def main1(seed, game ,algorithm, group, algorithm_number, gen):
     experiment_name = 'dummy_demo'
     if not os.path.exists(experiment_name):
         os.makedirs(experiment_name)
@@ -74,7 +74,7 @@ def main1(seed, game, algorithm, group):
     #---------------------
 
 
-    creator.create("FitnessMin", base.Fitness, weights=(-30.0, -30.0))
+    creator.create("FitnessMin", base.Fitness, weights=(30.0, 30.0))
     creator.create("Individual", list, fitness=creator.FitnessMin)
     toolbox = base.Toolbox()
 
@@ -119,7 +119,7 @@ def main1(seed, game, algorithm, group):
     # drawn randomly from the current generation.
     toolbox.register("select", tools.selTournament)
 
-    creator.create("FitnessMin", base.Fitness, weights=(-100,))
+    creator.create("FitnessMin", base.Fitness, weights=(100,))
 
     #----------
 
@@ -127,177 +127,35 @@ def main1(seed, game, algorithm, group):
     def simulation(env,x):
         f,p,e,t = env.play(pcont=x)
         return f, p
-
-    a = f'/best_game_{game}group_1Tournement.txt'
+  
+    a =  f'\Algorithm_{algorithm_number}_group_{group}\individuals_game_{game}\game_{game}_gen_{gen}_group_1_Tournement.txt'
+    print(f"game = {game}, gen = {gen}")
     # Load specialist controller
     sol = np.loadtxt('dummy_demo' + a)
     print('\n LOADING SAVED SPECIALIST SOLUTION FOR ENEMY \n')
-    evaluate([sol])
-
-    # runs simulation
-    def main(seed, game, group):
-        file_aux  = open(str(algorithm)+'_group_'+str(group)+'.txt','a')
-        file_aux.write(f'\ngame {game} \n')
-        file_aux.write('gen, best, mean, std, median, q1, q3, life')
+    print(evaluate([sol]))
+    enemy_life = env.get_list_enemy_life()
+    fitnesses = env.get_list_fitnesses()
+    print(enemy_life)
+    if enemy_life.count(0) == 4:
+        file_aux  = open('champs.txt','a')
+        file_aux.write(f"Algorithm = {algorithm_number}, Group = {group}, Game = {game}, Gen = {gen} Enemy_lifes = {str(enemy_life)}, mean_enemy_life = {np.mean(enemy_life)}, fitnesses = {fitnesses}, mean_fitnesses = {np.mean(fitnesses)}\n")
+        file_aux.close()
+    elif enemy_life.count(0) == 4:
+        file_aux  = open('super_champs.txt','a')
+        file_aux.write(f"Algorithm = {algorithm_number}, Group = {group}, Game = {game}, Enemy_lifes = {str(enemy_life)}, fitnesses = {fitnesses}\n")
         file_aux.close()
 
-        # fitnesses = np.array([])
-        random.seed(seed)
-
-        # create an initial population of 30 individuals (where
-        # each individual is a list of integers)
-        pop = toolbox.population(n=50)
-        pop_array = np.array(pop)
-
-        # CXPB  is the probability with which two individuals
-        #       are crossed
-        # MUTPB is the probability for mutating an individual
-        CXPB = 0.8
-        
-        print("Start of evolution")
-        
-        # Evaluates the entire population
-        
-        values = evaluate(pop_array)
-        values = values[0].tolist()
-        fitnesses = []
-        lifes = []
-        for value in values:
-            fitnesses.append(value[0])
-            lifes.append(value[1])
-        for count, individual in enumerate(fitnesses):
-
-            # Rewrites the fitness value in a way the DEAP algorithm can understand
-            fitnesses[count] = (-individual, )
-    
-        # Gives individual a fitness value
-        for ind, fit in zip(pop, fitnesses):
-            ind.fitness.values = fit
-        
-        print("  Evaluated %i individuals" % len(pop))
-
-        # Extracting all the fitnesses of 
-        fits = [ind.fitness.values[0] for ind in pop]
-
-        # Variable keeping track of the number of generations
-        g = 0
-        g_end = 15
-
-        # Saves first generation
-        length = len(pop)
-        mean = sum(fits) / length * -1
-        sum2 = sum(x*x for x in fits)
-        std = abs(sum2 / length - abs(mean)**2)**0.5
-        q1 = np.percentile(fits, 25) * -1
-        median = np.percentile(fits, 50) * -1 
-        q3 = np.percentile(fits, 75) * -1
-        max_life = max(lifes) 
-        file_aux  = open(str(algorithm)+'_group_'+ str(group)+ '.txt','a')
-        file_aux.write(f'\n{str(g)}, {str(round(min(fits)*-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
-        file_aux.close()
-
-        # Begin the evolution
-        while max(fits) < 100 and g < g_end:
-            # A new generation
-            g = g + 1
-            print("-- Generation %i --" % g)
-
-            # Select the next generation individuals
-            offspring = toolbox.select(pop, len(pop), 6)
-            
-            for i in offspring:
-                print(i.fitness.values[0])
-            # Clone the selected individuals
-            offspring = list(map(toolbox.clone, offspring))
-
-            # Prints fitnesses of the offspring (does nothing for the algorithm
-            # for i in offspring:
-            #     print(i.fitness.values[0])
-
-            # Apply crossover and mutation on the offspring
-            for child1, child2 in zip(offspring[::2], offspring[1::2]):
-
-                # cross two individuals with probability CXPB
-                if random.random() < CXPB:
-
-                    toolbox.mate(child1, child2)
-
-                    # fitness values of the children
-                    # must be recalculated later
-                    del child1.fitness.values
-                    del child2.fitness.values
 
 
-            for mutant in offspring:
-                # mutate an individual with probability MUTPB
-                if random.random() < (0.5):
-                    toolbox.mutate(mutant)
-                    del mutant.fitness.values
-        
-            # Evaluate the individuals with an invalid fitness
-            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-            pop_array = np.array(invalid_ind)
-
-            values = evaluate(pop_array)
-            values = values[0].tolist()
-            fitnesses = []
-            for value in values:
-                fitnesses.append(value[0])
-                lifes.append(value[1])
-
-            for count, individual in enumerate(fitnesses):
-                fitnesses[count] = (-individual, )
-        
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
-            
-            print("  Evaluated %i individuals" % len(invalid_ind))
-            # Changes best individuals of population with worst individuals of the offspring
-            amount_swithed_individuals = int(len(pop)/10)
-            worst_offspring = deap.tools.selWorst(offspring, amount_swithed_individuals,fit_attr='fitness')
-            best_gen = deap.tools.selBest(pop, amount_swithed_individuals, fit_attr='fitness')
-
-            for count, individual in enumerate(worst_offspring):
-                index = offspring.index(individual)
-                offspring[index] = best_gen[count]
-
-            # The population is entirely replaced by the offspring (plus best of previous generations)
-            pop[:] = offspring
-            print(f"There are {len(pop)} individuals in the population ")
-    
-            # Gather all the fitnesses in one list and print the stats
-            fits = [ind.fitness.values[0] for ind in pop]
-
-            length = len(pop)
-            mean = sum(fits) / length * -1
-            sum2 = sum(x*x for x in fits)
-            std = abs(sum2 / length - mean**2)**0.5
-            q1 = np.percentile(fits, 25) * -1
-            median = np.percentile(fits, 50) * -1 
-            q3 = np.percentile(fits, 75) * -1
-            max_life = max(lifes) 
-            
-            print("  Min %s" % max(fits))
-            print("  Max %s" % min(fits))
-            print("  Avg %s" % mean)
-            print("  Std %s" % std)
-
-            # saves results for first pop
-            file_aux  = open(str(algorithm)+'_group_'+str(group)+'.txt','a')
-            file_aux.write(f'\n{str(g)}, {str(round(min(fits) *-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
-            file_aux.close()
-            best_ind = tools.selBest(pop, 1)[0]
-            print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
-            np.savetxt(experiment_name+'/individuals_game_'+str(game)+'/game_'+str(game)+'_gen_'+str(g)+'_group_'+str(group)+'_Tournement.txt',best_ind)
-        print("-- End of (successful) evolution --")
-        
-
-    # main(seed, game, group)
 
 algorithm = 'Tournement'
+algorithm_number = "1"
 group = "1"
-game = "2"
-for game in range(4,5):
-    seed = random.randint(1, 126)
-    main1(seed, game ,algorithm, group)
+game = "1"
+
+for game in range(10):
+    for gen in range(5,16):
+        seed = random.randint(1, 126)
+        main1(seed, game ,algorithm, group, algorithm_number, gen)
 

@@ -107,7 +107,7 @@ def main1(seed, game, algorithm, group):
     toolbox.register("evaluate", evaluate)
 
     # register the crossover operator
-    toolbox.register("mate", tools.cxBlend)
+    toolbox.register("mate", tools.cxBlend, alpha=0.05)
 
     # register a mutation operator with a probability to
     # flip each attribute/gene of 0.05
@@ -288,7 +288,7 @@ def main1(seed, game, algorithm, group):
 
     main(seed, game, group)
 
-algorithm = 'Tournement'
+algorithm = 'Tournement2'
 group = "1"
 algorithm_number = "2"
 for game in range(10):
