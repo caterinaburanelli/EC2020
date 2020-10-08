@@ -146,7 +146,7 @@ def main1(seed, game, algorithm, group):
 
         # create an initial population of 30 individuals (where
         # each individual is a list of integers)
-        pop = toolbox.population(n=50)
+        pop = toolbox.population(n=70)
         pop_array = np.array(pop)
 
         # CXPB  is the probability with which two individuals
