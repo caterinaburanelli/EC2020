@@ -36,7 +36,7 @@ from deap import creator
 from deap import tools
 from math import fabs,sqrt
 
-def main1(seed, game, algorithm):
+def main1(seed, game, algorithm, group):
     experiment_name = 'dummy_demo'
     if not os.path.exists(experiment_name):
         os.makedirs(experiment_name)
@@ -51,6 +51,7 @@ def main1(seed, game, algorithm):
                     player_controller=player_controller(n_hidden_neurons),
                     enemymode="static",
                     level=2,
+                    multiplemode="yes",
                     speed="fastest")
 
     # default environment fitness is assumed for experiment
@@ -127,16 +128,15 @@ def main1(seed, game, algorithm):
         f,p,e,t = env.play(pcont=x)
         return f, p
 
-    # a = f'/best_game_{game},enemy_{enemy},mutation_{MUTPB}.txt'
+    # a = f'/best_game_{game}Tournement.txt'
     # # Load specialist controller
     # sol = np.loadtxt('dummy_demo' + a)
     # print('\n LOADING SAVED SPECIALIST SOLUTION FOR ENEMY \n')
     # evaluate([sol])
 
-
     # runs simulation
-    def main(seed, game):
-        file_aux  = open(experiment_name+'/results_enemy'+ str(algorithm) + '.txt','a')
+    def main(seed, game, group):
+        file_aux  = open(str(algorithm)+'_group_'+str(group)+'.txt','a')
         file_aux.write(f'\ngame {game} \n')
         file_aux.write('gen, best, mean, std, median, q1, q3, life')
         file_aux.close()
@@ -144,7 +144,7 @@ def main1(seed, game, algorithm):
         # fitnesses = np.array([])
         random.seed(seed)
 
-        # create an initial population of 300 individuals (where
+        # create an initial population of 30 individuals (where
         # each individual is a list of integers)
         pop = toolbox.population(n=50)
         pop_array = np.array(pop)
@@ -181,7 +181,7 @@ def main1(seed, game, algorithm):
 
         # Variable keeping track of the number of generations
         g = 0
-        g_end = 15
+        g_end = 1
 
         # Saves first generation
         length = len(pop)
@@ -192,7 +192,7 @@ def main1(seed, game, algorithm):
         median = np.percentile(fits, 50) * -1 
         q3 = np.percentile(fits, 75) * -1
         max_life = max(lifes) 
-        file_aux  = open(experiment_name+'/Tournement.txt','a')
+        file_aux  = open(str(algorithm)+'_group_'+ str(group)+ '.txt','a')
         file_aux.write(f'\n{str(g)}, {str(round(min(fits)*-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
         file_aux.close()
 
@@ -203,7 +203,7 @@ def main1(seed, game, algorithm):
             print("-- Generation %i --" % g)
 
             # Select the next generation individuals
-            offspring = toolbox.select(pop, len(pop), 5)
+            offspring = toolbox.select(pop, len(pop), 6)
             
             for i in offspring:
                 print(i.fitness.values[0])
@@ -230,7 +230,7 @@ def main1(seed, game, algorithm):
 
             for mutant in offspring:
                 # mutate an individual with probability MUTPB
-                if random.random() < (1 - (g/g_end)):
+                if random.random() < (0.5):
                     toolbox.mutate(mutant)
                     del mutant.fitness.values
         
@@ -283,19 +283,21 @@ def main1(seed, game, algorithm):
             print("  Std %s" % std)
 
             # saves results for first pop
-            file_aux  = open(experiment_name+'/Tournement.txt','a')
+            file_aux  = open(str(algorithm)+'_group_'+str(group)+'.txt','a')
             file_aux.write(f'\n{str(g)}, {str(round(min(fits) *-1,6))}, {str(round(mean,6))}, {str(round(std,6))}, {str(round(median,6))}, {str(round(q1,6))}, {str(round(q3,6))}, {str(round(max_life,6))}')
             file_aux.close()
-        
+            best_ind = tools.selBest(pop, 1)[0]
+            print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+            np.savetxt(experiment_name+'/Algorithm_'+ algorithm_number + '_group_'+group+'/individuals_game_'+str(game)+'/game_'+str(game)+'_gen_'+str(g)+'_group_'+str(group)+'_Tournement.txt',best_ind)
         print("-- End of (successful) evolution --")
         
-        best_ind = tools.selBest(pop, 1)[0]
-        print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
-        np.savetxt(experiment_name+'/best_game_'+str(game)+'Tournement.txt',best_ind)
-    main(seed, game)
+
+    main(seed, game, group)
 
 algorithm = 'Tournement'
+group = "1"
+algorithm_number = "1"
 for game in range(10):
     seed = random.randint(1, 126)
-    main1(seed, game ,algorithm)
+    main1(seed, game ,algorithm, group)
 

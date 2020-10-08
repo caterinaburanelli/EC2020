@@ -14,9 +14,9 @@ MESSAGE: Pygame initialized for simulation.
 
 multiple mode: yes
 
-enemies list: 1 2 3 4 5 7 8
+enemies list: 7 8
 
-current enemy: 1
+current enemy: 7
 
 player mode: ai
 
@@ -48,16 +48,18 @@ save logs: yes
 
 ########## Simulation state - END ###########
 
-RUN: run status: enemy: 1; fitness: 48.701682633451966; player life: 0; enemy life: 40.0; time: 200
+RUN: run status: enemy: 7; fitness: -5.968707559985366; player life: 0; enemy life: 100; time: 391
 
-RUN: run status: enemy: 2; fitness: 66.21310261863329; player life: 0; enemy life: 20.0; time: 326
+RUN: run status: enemy: 8; fitness: -5.961005339623274; player life: 0; enemy life: 100; time: 388
 
-RUN: run status: enemy: 3; fitness: 39.17399989261955; player life: 0; enemy life: 50.0; time: 339
+RUN: run status: enemy: 7; fitness: -2.772588722239781; player life: 0; enemy life: 100; time: 16
 
-RUN: run status: enemy: 4; fitness: 30.17695410451698; player life: 0; enemy life: 60.0; time: 338
+RUN: run status: enemy: 8; fitness: 3.3616453306662546; player life: 0; enemy life: 90.0; time: 281
 
-RUN: run status: enemy: 5; fitness: 90.3852886203982; player life: 59.80000000000033; enemy life: 0; time: 269
+RUN: run status: enemy: 7; fitness: -2.833213344056216; player life: 0; enemy life: 100; time: 17
 
-RUN: run status: enemy: 7; fitness: 88.88675666571224; player life: 48.400000000000304; enemy life: 0; time: 385
+RUN: run status: enemy: 8; fitness: -5.631211781821365; player life: 0; enemy life: 100; time: 279
 
-RUN: run status: enemy: 8; fitness: 85.11611293289349; player life: 11.20000000000023; enemy life: 0; time: 405
+RUN: run status: enemy: 7; fitness: -2.70805020110221; player life: 0; enemy life: 100; time: 15
+
+RUN: run status: enemy: 8; fitness: -5.869296913133774; player life: 0; enemy life: 100; time: 354
