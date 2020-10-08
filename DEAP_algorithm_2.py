@@ -175,7 +175,7 @@ def main1(seed, game, algorithm, group):
 
         # Variable keeping track of the number of generations
         g = 0
-        g_end = 1
+        g_end = 15
 
         # Saves first generation
         length = len(pop)
