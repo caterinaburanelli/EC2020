@@ -70,7 +70,10 @@ class Environment(object):
         self.timeexpire = timeexpire
         self.overturetime = overturetime
         self.solutions = solutions
-
+        self.list_enemy_life = []
+        self.list_fitnesses = []
+        self.list_player_life = []
+        self.list_time = []
 
         # initializes default random controllers
 
@@ -405,6 +408,15 @@ class Environment(object):
         return self.time
 
 
+    def get_list_enemy_life(self):
+        return  self.list_enemy_life
+
+    def get_lists_competition_life(self):
+        return  self.list_player_life, self.list_time
+
+    def get_list_fitnesses(self):
+        return  self.list_fitnesses
+
     # runs game for a single enemy
     def run_single(self,enemyn,pcont,econt):
 
@@ -498,10 +510,11 @@ class Environment(object):
             # returns results of the run
             def return_run():
                 self.print_logs("RUN: run status: enemy: "+str(self.enemyn)+"; fitness: " + str(fitness) + "; player life: " + str(self.player.life)  + "; enemy life: " + str(self.enemy.life) + "; time: " + str(self.time))
-
+                self.list_enemy_life.append(self.enemy.life)
+                self.list_fitnesses.append(fitness)
+                self.list_player_life.append(self.player.life)
+                self.list_time.append(self.time)
                 return  fitness, self.player.life, self.enemy.life, self.time
-
-
 
             if self.start == False and self.playermode == "human":
 
@@ -579,7 +592,6 @@ class Environment(object):
 
     # repeats run for every enemy in list
     def multiple(self,pcont,econt):
-
         vfitness, vplayerlife, venemylife, vtime = [],[],[],[]
         for e in self.enemies:
 
