@@ -128,7 +128,7 @@ def main1(seed, game ,algorithm, group, algorithm_number, gen):
         f,p,e,t = env.play(pcont=x)
         return f, p
   
-    a =  f'\Algorithm_{algorithm_number}_group_{group}\individuals_game_{game}\game_{game}_gen_{gen}_group_1_Tournement.txt'
+    a =  f'\Algorithm_{algorithm_number}_group_{group}\individuals_game_{game}\game_{game}_gen_{gen}_group_{group}_Tournement.txt'
     print(f"game = {game}, gen = {gen}")
     # Load specialist controller
     sol = np.loadtxt('dummy_demo' + a)
@@ -136,10 +136,14 @@ def main1(seed, game ,algorithm, group, algorithm_number, gen):
     print(evaluate([sol]))
     enemy_life = env.get_list_enemy_life()
     fitnesses = env.get_list_fitnesses()
-    print(enemy_life)
+    competition = env.get_lists_competition_life()
+
+    sum_life = np.sum(competition[0])
+    sum_time = np.sum(competition[1])
+
     if enemy_life.count(0) == 4:
         file_aux  = open('champs.txt','a')
-        file_aux.write(f"Algorithm = {algorithm_number}, Group = {group}, Game = {game}, Gen = {gen} Enemy_lifes = {str(enemy_life)}, mean_enemy_life = {np.mean(enemy_life)}, fitnesses = {fitnesses}, mean_fitnesses = {np.mean(fitnesses)}\n")
+        file_aux.write(f"Algorithm = {algorithm_number}, Group = {group}, Game = {game}, Gen = {gen} sum_player_life = {str(sum_life)}, mean_enemy_life = {np.mean(enemy_life)}, sum_time = {sum_time}, mean_fitnesses = {np.mean(fitnesses)}\n")
         file_aux.close()
     elif enemy_life.count(0) == 4:
         file_aux  = open('super_champs.txt','a')
@@ -150,12 +154,11 @@ def main1(seed, game ,algorithm, group, algorithm_number, gen):
 
 
 algorithm = 'Tournement'
-algorithm_number = "1"
-group = "1"
-game = "1"
+algorithm_number = "2"
+groups = ["1"]
 
-for game in range(10):
-    for gen in range(5,16):
-        seed = random.randint(1, 126)
-        main1(seed, game ,algorithm, group, algorithm_number, gen)
-
+for group in groups:
+    for game in range(10):
+        for gen in range(5,16):
+            seed = random.randint(1, 126)
+            main1(seed, game ,algorithm, group, algorithm_number, gen)
