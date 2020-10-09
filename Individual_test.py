@@ -145,7 +145,7 @@ def main1(seed, game ,algorithm, group, algorithm_number, gen):
         file_aux  = open('champs.txt','a')
         file_aux.write(f"Algorithm = {algorithm_number}, Group = {group}, Game = {game}, Gen = {gen} sum_player_life = {str(sum_life)}, mean_enemy_life = {np.mean(enemy_life)}, sum_time = {sum_time}, mean_fitnesses = {np.mean(fitnesses)}\n")
         file_aux.close()
-    elif enemy_life.count(0) == 4:
+    elif enemy_life.count(0) == 5:
         file_aux  = open('super_champs.txt','a')
         file_aux.write(f"Algorithm = {algorithm_number}, Group = {group}, Game = {game}, Enemy_lifes = {str(enemy_life)}, fitnesses = {fitnesses}\n")
         file_aux.close()
@@ -154,8 +154,8 @@ def main1(seed, game ,algorithm, group, algorithm_number, gen):
 
 
 algorithm = 'Tournement'
-algorithm_number = "2"
-groups = ["1"]
+algorithm_number = ["1", "2"]
+groups = ["1", "2"]
 
 for group in groups:
     for game in range(10):
